@@ -1,8 +1,41 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
-  <defs><linearGradient id="g" x1="0" x2="1"><stop stop-color="#0b3f82"/><stop offset="1" stop-color="#43d7b0"/></linearGradient></defs>
-  <rect width="128" height="128" rx="28" fill="url(#g)"/>
-  <path d="M39 56V42a25 25 0 0 1 50 0v14" fill="none" stroke="#fff" stroke-width="9" stroke-linecap="round"/>
-  <rect x="27" y="52" width="74" height="52" rx="13" fill="#fff"/>
-  <rect x="37" y="67" width="54" height="22" rx="8" fill="#147fa5"/>
-  <circle cx="50" cy="78" r="3" fill="#fff"/><circle cx="64" cy="78" r="3" fill="#fff"/><circle cx="78" cy="78" r="3" fill="#fff"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" fill="none">
+  <defs>
+    <!-- Gradiente para el borde exterior de forja y armadura -->
+    <linearGradient id="shieldRim" x1="14" y1="12" x2="114" y2="122" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#38BDF8"/>
+      <stop offset="100%" stop-color="#0EA5A5"/>
+    </linearGradient>
+
+    <!-- Gradiente para el destello del núcleo de la chispa -->
+    <linearGradient id="sparkGlow" x1="42" y1="40" x2="86" y2="84" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#38BDF8"/>
+      <stop offset="45%" stop-color="#00E5BE"/>
+      <stop offset="100%" stop-color="#0EA5A5"/>
+    </linearGradient>
+
+    <!-- Sombra sutil dimensional integrada -->
+    <filter id="emblemDepth" x="4" y="6" width="120" height="124" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+      <feDropShadow dx="0" dy="4" stdDeviation="4" flood-color="#0F172A" flood-opacity="0.25"/>
+    </filter>
+  </defs>
+
+  <g filter="url(#emblemDepth)">
+    <!-- Faceta Izquierda de la Placa (Pizarra de medianoche profunda) -->
+    <path d="M 64 22 L 42 12 L 14 28 L 14 68 C 14 96 38 116 64 122 Z" fill="#0B132B"/>
+
+    <!-- Faceta Derecha de la Placa (Pizarra grafito biselada) -->
+    <path d="M 64 22 L 86 12 L 114 28 L 114 68 C 114 96 90 116 64 122 Z" fill="#1E293B"/>
+
+    <!-- Borde de Armadura Esculpido Autónomo (Contorno continuo de alta definición) -->
+    <path d="M 64 22 L 86 12 L 114 28 L 114 68 C 114 96 90 116 64 122 C 38 116 14 96 14 68 L 14 28 L 42 12 Z" fill="none" stroke="url(#shieldRim)" stroke-width="4.5" stroke-linejoin="round"/>
+
+    <!-- Costura o Columna de Temple Central -->
+    <line x1="64" y1="23" x2="64" y2="120" stroke="url(#shieldRim)" stroke-width="2" stroke-opacity="0.35"/>
+  </g>
+
+  <!-- Chispa de la Forja / Núcleo de Entropía Criptográfica -->
+  <path d="M 64 40 Q 64 62 86 62 Q 64 62 64 84 Q 64 62 42 62 Q 64 62 64 40 Z" fill="url(#sparkGlow)"/>
+
+  <!-- Punto brillante de alta resolución óptica -->
+  <circle cx="64" cy="62" r="3.5" fill="#FFFFFF"/>
 </svg>
