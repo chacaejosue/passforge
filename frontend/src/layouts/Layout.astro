@@ -1,20 +1,33 @@
 ---
 import "../styles/global.css";
 import Analytics from "@vercel/analytics/astro";
-const { title = "PassForge — Generador seguro de contraseñas", description = "Genera contraseñas seguras con Python, Flask y secrets." } = Astro.props;
+const {
+  title = "PassForge | Generador seguro de contraseñas",
+  description = "Genera contraseñas criptográficamente seguras con Python, Flask y secrets.",
+} = Astro.props;
 ---
 <!doctype html>
 <html lang="es">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="description" content={description} />
+    <meta name="color-scheme" content="light dark" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <Analytics />
     <script is:inline>
+      document.documentElement.classList.add("js");
       const savedTheme = localStorage.getItem("passforge-theme");
       const systemDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
-      document.documentElement.dataset.theme = savedTheme === "light" || savedTheme === "dark" ? savedTheme : systemDark ? "dark" : "light";
+      document.documentElement.dataset.theme =
+        savedTheme === "light" || savedTheme === "dark"
+          ? savedTheme
+          : systemDark
+            ? "dark"
+            : "light";
+      if (!window.location.hash && history.scrollRestoration) {
+        history.scrollRestoration = "manual";
+      }
     </script>
     <title>{title}</title>
   </head>
