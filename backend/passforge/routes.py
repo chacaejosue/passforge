@@ -46,23 +46,25 @@ def passwords():
 
     try:
         password = generate_password(length, **options)
-    except (TypeError, ValueError) as error:
-        return jsonify(error=str(error)), 400
+    except (TypeError, ValueError):
+        return jsonify(error="Parámetros de generación no válidos."), 400
 
     alphabet_size = sum(
-        [26 if options["lowercase"] else 0,
-         26 if options["uppercase"] else 0,
-         10 if options["digits"] else 0,
-         32 if options["symbols"] else 0]
+        [
+            26 if options["lowercase"] else 0,
+            26 if options["uppercase"] else 0,
+            10 if options["digits"] else 0,
+            32 if options["symbols"] else 0,
+        ]
     )
+    entropy = estimate_entropy(len(password), alphabet_size)
     return jsonify(
         password=password,
         length=len(password),
-        entropy=estimate_entropy(len(password), alphabet_size),
-        estimated_exhaustive_years=estimate_exhaustive_years(
-            estimate_entropy(len(password), alphabet_size)
-        ),
+        entropy=entropy,
+        estimated_exhaustive_years=estimate_exhaustive_years(entropy),
         guesses_per_second=100_000_000_000,
         entropy_note="Estimación para una selección uniforme del alfabeto indicado.",
         minimum_length=MIN_LENGTH,
+        maximum_length=MAX_LENGTH,
     )
