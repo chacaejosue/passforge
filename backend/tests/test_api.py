@@ -1,3 +1,4 @@
+import string
 import unittest
 
 from backend.passforge.app import create_app
@@ -32,6 +33,70 @@ class TestPasswordAPI(unittest.TestCase):
             json={"length": 20, "symbols": "yes"},
         )
         self.assertEqual(response.status_code, 400)
+
+    def test_rejects_boolean_length(self):
+        response = self.client.post("/api/passwords", json={"length": True})
+        self.assertEqual(response.status_code, 400)
+
+    def test_rejects_length_above_maximum(self):
+        response = self.client.post("/api/passwords", json={"length": 256})
+        self.assertEqual(response.status_code, 400)
+
+    def test_rejects_all_disabled_options(self):
+        response = self.client.post(
+            "/api/passwords",
+            json={
+                "length": 16,
+                "lowercase": False,
+                "uppercase": False,
+                "digits": False,
+                "symbols": False,
+            },
+        )
+        self.assertEqual(response.status_code, 400)
+
+    def test_generates_digits_only_when_selected(self):
+        response = self.client.post(
+            "/api/passwords",
+            json={
+                "length": 18,
+                "lowercase": False,
+                "uppercase": False,
+                "digits": True,
+                "symbols": False,
+            },
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(all(ch in string.digits for ch in response.json["password"]))
+
+    def test_security_and_cors_headers(self):
+        response = self.client.post(
+            "/api/passwords",
+            json={"length": 16},
+            headers={"Origin": "http://localhost:4321"},
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(
+            response.headers.get("Access-Control-Allow-Origin"),
+            "http://localhost:4321",
+        )
+        self.assertIn("no-store", response.headers.get("Cache-Control", ""))
+        self.assertEqual(response.headers.get("X-Content-Type-Options"), "nosniff")
+        self.assertEqual(response.headers.get("X-Frame-Options"), "DENY")
+
+    def test_rate_limiting_returns_429(self):
+        limited_client = create_app(rate_limit_per_minute=2).test_client()
+        self.assertEqual(
+            limited_client.post("/api/passwords", json={"length": 16}).status_code,
+            200,
+        )
+        self.assertEqual(
+            limited_client.post("/api/passwords", json={"length": 16}).status_code,
+            200,
+        )
+        blocked = limited_client.post("/api/passwords", json={"length": 16})
+        self.assertEqual(blocked.status_code, 429)
+        self.assertIn("Retry-After", blocked.headers)
 
 
 if __name__ == "__main__":
