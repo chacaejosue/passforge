@@ -4,23 +4,478 @@ import PasswordGenerator from "../components/PasswordGenerator.astro";
 import PasswordManagerGuide from "../components/PasswordManagerGuide.astro";
 ---
 <Layout>
-  <header class="site-header"><div class="container nav-wrap"><a href="/" class="brand"><span class="brand-mark"><img src="/favicon.svg" alt="" /></span><span>Pass<strong>Forge</strong></span><small>v2 beta</small></a><nav class="desktop-nav" aria-label="Navegación principal"><a href="#generador">Generador</a><a href="#evolucion">Evolución</a><a href="#seguridad">Seguridad</a><a href="#arquitectura">Arquitectura</a></nav><div class="nav-actions"><button id="theme-toggle" class="theme-toggle" type="button" aria-label="Cambiar a modo oscuro" title="Cambiar tema"><svg class="theme-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.42 1.42M17.65 17.65l1.42 1.42M2 12h2M20 12h2M4.93 19.07l1.42-1.42M17.65 6.35l1.42-1.42"/></svg><svg class="theme-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20.5 15.5A8.5 8.5 0 0 1 8.5 3.5 8.5 8.5 0 1 0 20.5 15.5Z"/></svg></button><a class="button button-secondary github-link" href="https://github.com/chacaejosue/pass-forge" target="_blank" rel="noreferrer">Ver en GitHub</a></div></div></header>
+  <header class="site-header">
+    <div class="container nav-wrap">
+      <a href="#top" class="brand" id="brand-link" aria-label="PassForge — Volver al inicio">
+        <span class="brand-mark"><img src="/favicon.svg" alt="" width="32" height="32" /></span>
+        <span class="brand-text">Pass<span class="brand-accent">Forge</span></span>
+      </a>
+      <nav class="desktop-nav" aria-label="Navegación principal">
+        <a href="#generador" data-nav-link="generador">Generador</a>
+        <a href="#guardar" data-nav-link="guardar">Custodia</a>
+        <a href="#evolucion" data-nav-link="evolucion">Evolución</a>
+        <a href="#seguridad" data-nav-link="seguridad">Seguridad</a>
+        <a href="#arquitectura" data-nav-link="arquitectura">Arquitectura</a>
+      </nav>
+      <div class="nav-actions">
+        <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Cambiar a modo oscuro" title="Cambiar tema">
+          <svg class="theme-sun" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <circle cx="12" cy="12" r="4"/>
+            <path d="M12 2v2m0 16v2M4.93 4.93l1.41 1.41m11.32 11.32 1.41 1.41M2 12h2m16 0h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/>
+          </svg>
+          <svg class="theme-moon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/>
+          </svg>
+        </button>
+        <a class="github-link" href="https://github.com/chacaejosue/pass-forge" target="_blank" rel="noreferrer" aria-label="Repositorio en GitHub">
+          <svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor" aria-hidden="true">
+            <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+          </svg>
+          <span>GitHub</span>
+        </a>
+      </div>
+    </div>
+  </header>
+
   <main>
-    <section class="container hero-section"><div class="hero-art reveal"><img src="/portada-passforge.svg" alt="PassForge — Generador de contraseñas en Python" /><div class="hero-badges"><span><i></i> Motor v2 criptográfico</span><span>PEP 506 compliant</span></div></div><div class="hero-copy reveal"><div class="tech-badges"><span>Python 3.9+</span><span>Flask Web Engine</span><span>Licencia MIT</span><span class="status-badge">v2 activa</span></div><h1>Generación segura, <span>sin atajos.</span></h1><p>PassForge genera contraseñas de alta entropía con <code>secrets</code>, documentando la evolución desde una práctica de consola hasta una aplicación web moderna.</p><div class="hero-actions"><a href="#generador" class="button button-primary">Probar el generador</a><a href="#evolucion" class="button button-secondary">Explorar la evolución</a></div></div><PasswordGenerator /></section>
+    <section class="container hero-section">
+      <div class="hero-copy reveal">
+        <div class="tech-badges">
+          <span>Python 3.9+</span>
+          <span>Flask API</span>
+          <span>PEP 506 CSPRNG</span>
+        </div>
+        <h1>Generación segura, <span>sin atajos.</span></h1>
+        <p>Contraseñas de alta entropía impulsadas por <code>secrets</code>. Un recorrido transparente desde una práctica de consola hasta una arquitectura web moderna.</p>
+        <div class="hero-actions">
+          <a href="#generador" class="button button-primary">Ir al generador</a>
+          <a href="#evolucion" class="button button-secondary">Ver evolución técnica</a>
+        </div>
+      </div>
+      <PasswordGenerator />
+    </section>
+
     <PasswordManagerGuide />
-    <section id="evolucion" class="section"><div class="container"><div class="section-heading reveal"><span class="eyebrow">Fundamento del proyecto</span><h2>Por qué <code>secrets</code> y nunca <em>random</em></h2><p>Una decisión técnica puede cambiar la seguridad de todo un producto.</p></div><div class="comparison-grid"><article class="surface comparison-card legacy reveal"><div class="card-top"><span class="tag danger">v1 · Educativa / Legacy</span><code>random.choice()</code></div><h3>PRNG de propósito general</h3><p>Basado en Mersenne Twister. Es determinista y predecible si un atacante reconstruye su estado interno.</p><ul><li>Inadecuado para credenciales o tokens.</li><li>No está diseñado para secretos criptográficos.</li></ul><pre>import random  # no apto para seguridad</pre></article><article class="surface comparison-card current reveal"><div class="card-top"><span class="tag success">v2 · Actual PassForge</span><code>secrets.choice()</code></div><h3>CSPRNG nativo del sistema</h3><p><code>secrets</code> utiliza la fuente criptográficamente segura del sistema operativo para producir valores impredecibles.</p><ul><li>Recomendado para contraseñas y tokens.</li><li>Implementación alineada con PEP 506.</li></ul><pre>import secrets  # grado criptográfico</pre></article></div><div class="rule-banner reveal"><strong>Regla de oro:</strong> aumentar caracteres no compensa utilizar una fuente de aleatoriedad insegura.</div></div></section>
-    <section id="seguridad" class="section section-white"><div class="container"><div class="section-heading reveal"><span class="eyebrow">Buenas prácticas</span><h2>Consejos de seguridad actuales</h2><p>Principios prácticos para proteger tus credenciales más allá del generador.</p></div><div class="card-grid"><article class="surface info-card reveal"><span class="icon-box icon-blue" aria-hidden="true"><svg class="security-icon" viewBox="0 0 24 24" fill="none"><path d="M4 7h16M4 12h16M4 17h10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M18 15v5m-2.5-2.5h5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></span><h3>Longitud vence a complejidad</h3><p>Cada carácter extra multiplica el espacio de búsqueda. Prioriza contraseñas largas y únicas.</p><strong>Espacio exponencial</strong></article><article class="surface info-card reveal"><span class="icon-box icon-teal" aria-hidden="true"><svg class="security-icon" viewBox="0 0 24 24" fill="none"><path d="M8 8V6a4 4 0 0 1 8 0v2M6 8h12v11H6z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="m9 13 2 2 4-4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span><h3>Cero reutilización</h3><p>Una contraseña exclusiva por servicio limita el impacto de una filtración.</p><strong>Aislamiento de riesgo</strong></article><article class="surface info-card reveal"><span class="icon-box icon-blue" aria-hidden="true"><svg class="security-icon" viewBox="0 0 24 24" fill="none"><path d="M4 9h16v11H4zM7 9V6a5 5 0 0 1 10 0v3" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M8 14h8M8 17h5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></span><h3>Gestores de bóveda</h3><p>Custodia tus credenciales en gestores con arquitectura de conocimiento cero.</p><strong>Cifrado local</strong></article><article class="surface info-card reveal"><span class="icon-box icon-teal" aria-hidden="true"><svg class="security-icon" viewBox="0 0 24 24" fill="none"><path d="M12 3 20 6v5c0 5-3.4 8.2-8 10-4.6-1.8-8-5-8-10V6z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M9 12h6M12 9v6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></span><h3>MFA siempre activo</h3><p>Una segunda barrera protege tu cuenta incluso si una contraseña se filtra.</p><strong>Defensa en profundidad</strong></article></div></div></section>
-    <section id="arquitectura" class="section"><div class="container"><div class="section-heading reveal"><span class="eyebrow">Transparencia técnica</span><h2>Arquitectura y ejecución local</h2><p>La evolución completa, desde la CLI hasta la API web de Flask.</p></div><div class="surface architecture reveal"><div class="architecture-top"><div><h3>PassForge en tu máquina</h3><p>Ejecuta, prueba y entiende cada capa del proyecto.</p></div><div class="architecture-tabs" role="tablist"><button class="active" data-tab="cli" role="tab" aria-selected="true" type="button">Consola CLI</button><button data-tab="flask" role="tab" aria-selected="false" type="button">Servidor Flask</button><button data-tab="tests" role="tab" aria-selected="false" type="button">Tests</button></div></div><div class="console-panel" data-panel="cli"><div class="window-bar"><span></span><span></span><span></span><small>terminal bash</small><button class="copy-code" data-code="python -m src.cli" type="button">Copiar</button></div><code><span># Ejecutar el generador interactivo</span><br />python -m src.cli</code><p>Genera contraseñas criptográficas directamente desde la terminal.</p></div><div class="console-panel hidden" data-panel="flask"><div class="window-bar"><span></span><span></span><span></span><small>servidor Flask</small><button class="copy-code" data-code="python -m flask --app backend.passforge.app run --debug" type="button">Copiar</button></div><code><span># Iniciar la API web local</span><br />python -m flask --app backend.passforge.app run --debug</code><p>Expone el generador mediante los endpoints REST de Flask.</p></div><div class="console-panel hidden" data-panel="tests"><div class="window-bar"><span></span><span></span><span></span><small>suite automatizada</small><button class="copy-code" data-code="python -m unittest discover -s tests -v" type="button">Copiar</button></div><code><span># Ejecutar las pruebas de regresión</span><br />python -m unittest discover -s tests -v<br />python -m unittest discover -s backend/tests -v</code><p>Verifica longitud, composición, API y comportamiento esperado.</p></div><div class="author-line"><span class="author-mark">JC</span><span>Desarrollado con enfoque educativo y abierto por <strong>Josué Chacae</strong>.</span><a href="https://github.com/chacaejosue" target="_blank" rel="noreferrer">Ver perfil</a></div></div></div></section>
+
+    <section id="evolucion" class="section">
+      <div class="container">
+        <div class="section-heading reveal">
+          <span class="eyebrow">Fundamento técnico</span>
+          <h2>Por qué <code>secrets</code> y nunca <em>random</em></h2>
+          <p>La diferencia entre una clave predecible y una criptográficamente segura reside en la fuente de entropía.</p>
+        </div>
+        <div class="comparison-grid">
+          <article class="surface comparison-card legacy reveal">
+            <div class="card-top">
+              <span class="tag danger">Educativa / Insegura</span>
+              <code>random.choice()</code>
+            </div>
+            <h3>PRNG de propósito general</h3>
+            <p>Basado en Mersenne Twister (MT19937). Es determinista: basta observar 624 salidas consecutivas para reconstruir su estado interno y predecir todas las claves futuras.</p>
+            <ul>
+              <li>Inadecuado para credenciales, llaves o tokens de sesión.</li>
+              <li>Diseñado para simulación y estadística, no para seguridad.</li>
+            </ul>
+            <pre>import random  # Estado interno predecible (no criptográfico)</pre>
+          </article>
+          <article class="surface comparison-card current reveal">
+            <div class="card-top">
+              <span class="tag success">Motor Criptográfico</span>
+              <code>secrets.choice()</code>
+            </div>
+            <h3>CSPRNG nativo del sistema operativo</h3>
+            <p><code>secrets</code> delega en el generador seguro del núcleo del sistema (<code>/dev/urandom</code> o <code>BCryptGenRandom</code>) para producir entropía verdaderamente impredecible.</p>
+            <ul>
+              <li>Estándar oficial de Python (PEP 506) para credenciales sensibles.</li>
+              <li>Mezclado uniforme mediante <code>secrets.SystemRandom().shuffle()</code>.</li>
+            </ul>
+            <pre>import secrets  # Entropía de grado criptográfico</pre>
+          </article>
+        </div>
+        <div class="rule-banner reveal">
+          <strong>Principio matemático:</strong> ampliar el alfabeto de símbolos en claves cortas no compensa el uso de un generador de aleatoriedad predecible.
+        </div>
+      </div>
+    </section>
+
+    <section id="seguridad" class="section section-alt">
+      <div class="container">
+        <div class="section-heading reveal">
+          <span class="eyebrow">Defensa en profundidad</span>
+          <h2>Principios de seguridad</h2>
+          <p>Recomendaciones esenciales alineadas con las directrices de NIST y CISA.</p>
+        </div>
+        <div class="card-grid">
+          <article class="surface info-card reveal">
+            <span class="icon-box" aria-hidden="true">
+              <!-- Modern Binary Data / Entropy Icon -->
+              <svg class="security-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="14" y="14" width="4" height="6" rx="2"/>
+                <rect x="6" y="4" width="4" height="6" rx="2"/>
+                <path d="M6 20h4"/>
+                <path d="M14 10h4"/>
+                <path d="M6 14h2v6"/>
+                <path d="M14 4h2v6"/>
+              </svg>
+            </span>
+            <h3>Longitud antes que adornos</h3>
+            <p>La longitud expande el espacio de claves exponencialmente: 16 caracteres simples superan a 8 caracteres complejos.</p>
+            <strong>Crecimiento exponencial</strong>
+          </article>
+          <article class="surface info-card reveal">
+            <span class="icon-box" aria-hidden="true">
+              <!-- Modern Fingerprint / Unique Identity Icon -->
+              <svg class="security-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 10a2 2 0 0 0-2 2c0 1.02-.1 2.51-.26 3"/>
+                <path d="M14 13.12c0 2.38 0 6.38-1 8.88"/>
+                <path d="M17.29 21.02c.12-.6.43-2.3.5-3.02"/>
+                <path d="M2 12a10 10 0 0 1 18-6"/>
+                <path d="M2 16h.01"/>
+                <path d="M21.8 16c.2-2 .131-5.354 0-6"/>
+                <path d="M5 19.5C5.5 18 6 15 6 12a6 6 0 0 1 .34-2"/>
+                <path d="M8.65 22c.21-.66.45-1.32.57-2"/>
+                <path d="M9 6.8a6 6 0 0 1 9 5.2v2"/>
+              </svg>
+            </span>
+            <h3>Cero reutilización</h3>
+            <p>Una clave distinta por cuenta neutraliza ataques de <em>credential stuffing</em> ante filtraciones masivas.</p>
+            <strong>Aislamiento de brechas</strong>
+          </article>
+          <article class="surface info-card reveal">
+            <span class="icon-box" aria-hidden="true">
+              <!-- Modern FolderLock / Vault Storage Icon -->
+              <svg class="security-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M10 20H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h3.9a2 2 0 0 1 1.69.9l.81 1.2a2 2 0 0 0 1.67.9H20a2 2 0 0 1 2 2v2.5"/>
+                <rect width="8" height="5" x="14" y="15" rx="1"/>
+                <path d="M16 15v-1.5a2 2 0 1 1 4 0V15"/>
+              </svg>
+            </span>
+            <h3>Bóvedas seguras</h3>
+            <p>Usa gestores con cifrado local de conocimiento cero. Las claves se cifran en tu dispositivo antes de viajar.</p>
+            <strong>Cero conocimiento</strong>
+          </article>
+          <article class="surface info-card reveal">
+            <span class="icon-box" aria-hidden="true">
+              <!-- Modern KeyRound / FIDO2 Passkey Icon -->
+              <svg class="security-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M2.586 17.414A2 2 0 0 0 2 18.828V21a1 1 0 0 0 1 1h3a1 1 0 0 0 1-1v-1a1 1 0 0 1 1-1h1a1 1 0 0 0 1-1v-1a1 1 0 0 1 1-1h.172a2 2 0 0 0 1.414-.586l.814-.814a6.5 6.5 0 1 0-4-4z"/>
+                <circle cx="16.5" cy="7.5" r=".5" fill="currentColor"/>
+              </svg>
+            </span>
+            <h3>MFA y Passkeys</h3>
+            <p>Activa autenticación en dos pasos con llaves FIDO2, Passkeys o TOTP; evita SMS por riesgo de SIM Swapping.</p>
+            <strong>Segundo factor robusto</strong>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section id="arquitectura" class="section">
+      <div class="container">
+        <div class="section-heading reveal">
+          <span class="eyebrow">Código abierto y auditable</span>
+          <h2>Arquitectura y ejecución local</h2>
+          <p>Inspecciona y ejecuta cada capa del proyecto directamente en tu entorno.</p>
+        </div>
+        <div class="surface architecture reveal">
+          <div class="architecture-top">
+            <div>
+              <h3>PassForge en tu máquina</h3>
+              <p>Mismo motor criptográfico en terminal y en la API REST de Flask.</p>
+            </div>
+            <div class="architecture-tabs" role="tablist" aria-label="Modos de ejecución de PassForge">
+              <button id="tab-cli" class="active" data-tab="cli" role="tab" aria-selected="true" aria-controls="panel-cli" type="button">Consola CLI</button>
+              <button id="tab-flask" data-tab="flask" role="tab" aria-selected="false" aria-controls="panel-flask" tabindex="-1" type="button">Servidor Flask</button>
+              <button id="tab-tests" data-tab="tests" role="tab" aria-selected="false" aria-controls="panel-tests" tabindex="-1" type="button">Suite de Tests</button>
+            </div>
+          </div>
+
+          <div id="panel-cli" class="console-panel" data-panel="cli" role="tabpanel" aria-labelledby="tab-cli" tabindex="0">
+            <div class="window-bar">
+              <span></span><span></span><span></span>
+              <small>terminal bash</small>
+              <button class="copy-code" data-code="python -m src.cli" type="button">Copiar</button>
+            </div>
+            <code><span># Ejecutar el generador interactivo por consola</span><br />python -m src.cli</code>
+            <p>Genera contraseñas criptográficas directamente desde la terminal sin dependencias externas.</p>
+          </div>
+
+          <div id="panel-flask" class="console-panel hidden" data-panel="flask" role="tabpanel" aria-labelledby="tab-flask" tabindex="0">
+            <div class="window-bar">
+              <span></span><span></span><span></span>
+              <small>servidor Flask</small>
+              <button class="copy-code" data-code="python -m flask --app backend.passforge.app run --debug" type="button">Copiar</button>
+            </div>
+            <code><span># Iniciar la API web local</span><br />python -m flask --app backend.passforge.app run --debug</code>
+            <p>Expone el generador mediante endpoints REST con cabeceras de seguridad y límite de peticiones.</p>
+          </div>
+
+          <div id="panel-tests" class="console-panel hidden" data-panel="tests" role="tabpanel" aria-labelledby="tab-tests" tabindex="0">
+            <div class="window-bar">
+              <span></span><span></span><span></span>
+              <small>unittest suite</small>
+              <button class="copy-code" data-code="python -m unittest discover -s tests -v && python -m unittest discover -s backend/tests -v" type="button">Copiar</button>
+            </div>
+            <code><span># Ejecutar las pruebas unitarias y de integración</span><br />python -m unittest discover -s tests -v<br />python -m unittest discover -s backend/tests -v</code>
+            <p>Verifica longitud, composición, cabeceras HTTP, CORS y protección contra abuso.</p>
+          </div>
+
+          <div class="author-line">
+            <span class="author-mark" aria-hidden="true">JC</span>
+            <span>Desarrollado con enfoque educativo y abierto por <strong>Josué Chacae</strong>.</span>
+            <a href="https://github.com/chacaejosue" target="_blank" rel="noreferrer">Ver perfil en GitHub →</a>
+          </div>
+        </div>
+      </div>
+    </section>
   </main>
-  <button id="back-to-top" class="back-to-top" type="button" aria-label="Volver al inicio" title="Volver al inicio"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12 7-7 7 7M12 5v14" /></svg></button><footer class="footer"><div class="container footer-row"><div><strong>PassForge</strong> por Josué Chacae<p>Generador criptográfico de código abierto impulsado por CSPRNG en Python.</p></div><div class="footer-badges"><span>PEP 506 secrets</span><span>Sin telemetría</span><span>Código abierto</span></div></div><div class="container footer-bottom"><span>Licencia MIT · 2026 Josué Chacae</span><a href="https://github.com/chacaejosue/pass-forge" target="_blank" rel="noreferrer">Repositorio GitHub</a></div></footer>
+
+  <button id="back-to-top" class="back-to-top" type="button" aria-label="Volver al inicio" title="Volver al inicio">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <line x1="12" x2="12" y1="19" y2="5"/>
+      <polyline points="5 12 12 5 19 12"/>
+    </svg>
+  </button>
+
+  <footer class="footer">
+    <div class="container footer-row">
+      <div>
+        <strong>PassForge</strong> por Josué Chacae
+        <p>Generador criptográfico de código abierto impulsado por CSPRNG en Python y Astro.</p>
+      </div>
+      <div class="footer-badges">
+        <span>PEP 506 secrets</span>
+        <span>Cero almacenamiento de claves</span>
+        <span>Código abierto (MIT)</span>
+      </div>
+    </div>
+    
+    <!-- Aviso legal minimalista desplegable -->
+    <div class="container legal-accordion">
+      <details id="legal-details" class="legal-details">
+        <summary class="legal-summary">
+          <span>Aviso legal, privacidad y exención de responsabilidad</span>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="m6 9 6 6 6-6"/>
+          </svg>
+        </summary>
+        <div class="legal-content">
+          <p>
+            PassForge es un proyecto educativo y de código abierto distribuido bajo la <a href="https://github.com/chacaejosue/pass-forge/blob/main/LICENSE" target="_blank" rel="noreferrer">Licencia MIT</a> «tal cual» (<em>as-is</em>), sin garantías expresas ni implícitas de ningún tipo. Las contraseñas se generan en memoria volátil con <code>Cache-Control: no-store</code> y <strong>jamás se almacenan, registran ni asocian a datos personales</strong> (arquitectura de cero custodia; las métricas de tráfico web son estrictamente anónimas y sin cookies). Debido a que las claves no se guardan, es imposible recuperarlas en caso de extravío. Los indicadores de entropía y tiempos de búsqueda exhaustiva son estimaciones matemáticas teóricas y no garantizan invulnerabilidad frente a malware en el dispositivo del usuario, phishing o filtraciones de servicios externos. El autor no asume responsabilidad civil o contractual por el uso de las credenciales generadas.
+          </p>
+        </div>
+      </details>
+    </div>
+
+    <div class="container footer-bottom">
+      <span>Licencia MIT · 2026 Josué Chacae · Bolivia</span>
+      <a href="https://github.com/chacaejosue/pass-forge" target="_blank" rel="noreferrer">Repositorio en GitHub</a>
+    </div>
+  </footer>
 </Layout>
 
 <script>
   const themeToggle = document.querySelector<HTMLButtonElement>("#theme-toggle");
-  const syncThemeLabel = () => { const dark = document.documentElement.dataset.theme === "dark"; themeToggle?.setAttribute("aria-label", dark ? "Cambiar a modo claro" : "Cambiar a modo oscuro"); themeToggle?.setAttribute("title", dark ? "Cambiar a modo claro" : "Cambiar a modo oscuro"); };
-  syncThemeLabel(); themeToggle?.addEventListener("click", () => { const next = document.documentElement.dataset.theme === "dark" ? "light" : "dark"; document.documentElement.dataset.theme = next; localStorage.setItem("passforge-theme", next); syncThemeLabel(); });
-  document.querySelectorAll<HTMLButtonElement>("[data-tab]").forEach((tab) => tab.addEventListener("click", () => { document.querySelectorAll("[data-tab]").forEach((item) => { item.classList.remove("active"); item.setAttribute("aria-selected", "false"); }); tab.classList.add("active"); tab.setAttribute("aria-selected", "true"); document.querySelectorAll<HTMLElement>("[data-panel]").forEach((panel) => panel.classList.toggle("hidden", panel.dataset.panel !== tab.dataset.tab)); }));
-  document.querySelectorAll<HTMLButtonElement>(".copy-code").forEach((button) => button.addEventListener("click", async () => { await navigator.clipboard.writeText(button.dataset.code || ""); const original = button.textContent; button.textContent = "Copiado"; setTimeout(() => { button.textContent = original; }, 1600); }));
-  const backToTop = document.querySelector<HTMLButtonElement>("#back-to-top"); window.addEventListener("scroll", () => backToTop?.classList.toggle("visible", window.scrollY > 520), { passive: true }); backToTop?.addEventListener("click", () => window.scrollTo({ top: 0, behavior: "smooth" }));
-  const observer = new IntersectionObserver((entries) => entries.forEach((entry) => { if (entry.isIntersecting) entry.target.classList.add("visible"); }), { threshold: 0.1 }); document.querySelectorAll(".reveal").forEach((element) => observer.observe(element));
+  const syncThemeLabel = () => {
+    const dark = document.documentElement.dataset.theme === "dark";
+    const label = dark ? "Cambiar a modo claro" : "Cambiar a modo oscuro";
+    themeToggle?.setAttribute("aria-label", label);
+    themeToggle?.setAttribute("title", label);
+  };
+  syncThemeLabel();
+  themeToggle?.addEventListener("click", () => {
+    const next = document.documentElement.dataset.theme === "dark" ? "light" : "dark";
+    document.documentElement.classList.add("is-theme-switching");
+    // Forzamos reflow sincrónico para registrar la transición en el 100% del árbol DOM antes del cambio de variables
+    void document.documentElement.offsetHeight;
+    document.documentElement.dataset.theme = next;
+    localStorage.setItem("passforge-theme", next);
+    syncThemeLabel();
+    setTimeout(() => {
+      document.documentElement.classList.remove("is-theme-switching");
+    }, 520);
+  });
+
+  // Clic en la marca del navbar: desplazamiento suave arriba sin recargar
+  const brandLink = document.querySelector<HTMLAnchorElement>("#brand-link");
+  brandLink?.addEventListener("click", (event) => {
+    event.preventDefault();
+    window.scrollTo({ top: 0, behavior: "smooth" });
+    history.pushState(null, "", window.location.pathname);
+    document.querySelectorAll<HTMLAnchorElement>("[data-nav-link]").forEach((link) => link.classList.remove("nav-active"));
+  });
+
+  // Scroll Spy: Iluminar la sección activa en el navbar con color adecuado
+  const navLinks = Array.from(document.querySelectorAll<HTMLAnchorElement>("[data-nav-link]"));
+  const sectionIds = ["generador", "guardar", "evolucion", "seguridad", "arquitectura"];
+  const trackedSections = sectionIds
+    .map((id) => document.getElementById(id))
+    .filter((el): el is HTMLElement => el !== null);
+
+  const updateActiveNav = () => {
+    const scrollPos = window.scrollY + 130;
+    let currentId = "";
+
+    for (const section of trackedSections) {
+      const top = section.offsetTop;
+      const height = section.offsetHeight;
+      if (scrollPos >= top && scrollPos < top + height) {
+        currentId = section.id;
+        break;
+      }
+    }
+
+    if (window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 60) {
+      currentId = trackedSections[trackedSections.length - 1]?.id || "";
+    }
+
+    navLinks.forEach((link) => {
+      const isActive = link.dataset.navLink === currentId;
+      link.classList.toggle("nav-active", isActive);
+    });
+  };
+
+  window.addEventListener("scroll", updateActiveNav, { passive: true });
+  updateActiveNav();
+
+  const tabs = Array.from(document.querySelectorAll<HTMLButtonElement>("[data-tab]"));
+  const activateTab = (tab: HTMLButtonElement, focusTab = false) => {
+    tabs.forEach((item) => {
+      const isSelected = item === tab;
+      item.classList.toggle("active", isSelected);
+      item.setAttribute("aria-selected", String(isSelected));
+      item.setAttribute("tabindex", isSelected ? "0" : "-1");
+    });
+    document.querySelectorAll<HTMLElement>("[data-panel]").forEach((panel) => {
+      panel.classList.toggle("hidden", panel.dataset.panel !== tab.dataset.tab);
+    });
+    if (focusTab) tab.focus();
+  };
+
+  tabs.forEach((tab, index) => {
+    tab.addEventListener("click", () => activateTab(tab));
+    tab.addEventListener("keydown", (event) => {
+      if (event.key === "ArrowRight" || event.key === "ArrowLeft") {
+        event.preventDefault();
+        const delta = event.key === "ArrowRight" ? 1 : -1;
+        const nextIndex = (index + delta + tabs.length) % tabs.length;
+        activateTab(tabs[nextIndex], true);
+      }
+    });
+  });
+
+  document.querySelectorAll<HTMLButtonElement>(".copy-code").forEach((button) =>
+    button.addEventListener("click", async () => {
+      try {
+        await navigator.clipboard.writeText(button.dataset.code || "");
+        const original = button.textContent;
+        button.textContent = "Copiado";
+        setTimeout(() => {
+          button.textContent = original;
+        }, 1600);
+      } catch {
+        button.textContent = "Error";
+      }
+    })
+  );
+
+  const backToTop = document.querySelector<HTMLButtonElement>("#back-to-top");
+  window.addEventListener(
+    "scroll",
+    () => backToTop?.classList.toggle("visible", window.scrollY > 520),
+    { passive: true }
+  );
+  backToTop?.addEventListener("click", () => window.scrollTo({ top: 0, behavior: "smooth" }));
+
+  const observer = new IntersectionObserver(
+    (entries) =>
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) entry.target.classList.add("visible");
+      }),
+    { threshold: 0.1 }
+  );
+  document.querySelectorAll(".reveal").forEach((element) => observer.observe(element));
+
+  // Animación suave para el acordeón legal (HTML5 Details + Web Animations API)
+  const legalDetails = document.querySelector<HTMLDetailsElement>("#legal-details");
+  if (legalDetails) {
+    const summary = legalDetails.querySelector<HTMLElement>(".legal-summary");
+    const content = legalDetails.querySelector<HTMLElement>(".legal-content");
+    let isClosing = false;
+    let isExpanding = false;
+    let currentAnim: Animation | null = null;
+    let contentAnim: Animation | null = null;
+
+    summary?.addEventListener("click", (event) => {
+      event.preventDefault();
+      legalDetails.style.overflow = "hidden";
+
+      if (isClosing || !legalDetails.open) {
+        if (currentAnim) currentAnim.cancel();
+        if (contentAnim) contentAnim.cancel();
+        isClosing = false;
+        isExpanding = true;
+
+        const startHeight = `${legalDetails.offsetHeight}px`;
+        legalDetails.open = true;
+        legalDetails.classList.add("is-expanded");
+
+        const summaryHeight = summary.offsetHeight;
+        const contentHeight = content ? content.offsetHeight : 0;
+        const endHeight = `${summaryHeight + contentHeight + 12}px`;
+
+        currentAnim = legalDetails.animate(
+          { height: [startHeight, endHeight] },
+          { duration: 280, easing: "cubic-bezier(0.16, 1, 0.3, 1)" }
+        );
+
+        contentAnim = content?.animate(
+          [
+            { opacity: 0, transform: "translateY(-6px)" },
+            { opacity: 1, transform: "translateY(0)" }
+          ],
+          { duration: 280, easing: "cubic-bezier(0.16, 1, 0.3, 1)" }
+        ) || null;
+
+        currentAnim.onfinish = () => {
+          legalDetails.style.height = "";
+          legalDetails.style.overflow = "";
+          isExpanding = false;
+          currentAnim = null;
+          contentAnim = null;
+        };
+      } else if (isExpanding || legalDetails.open) {
+        if (currentAnim) currentAnim.cancel();
+        if (contentAnim) contentAnim.cancel();
+        isExpanding = false;
+        isClosing = true;
+        legalDetails.classList.remove("is-expanded");
+
+        const startHeight = `${legalDetails.offsetHeight}px`;
+        const endHeight = `${summary.offsetHeight}px`;
+
+        currentAnim = legalDetails.animate(
+          { height: [startHeight, endHeight] },
+          { duration: 240, easing: "cubic-bezier(0.16, 1, 0.3, 1)" }
+        );
+
+        contentAnim = content?.animate(
+          [
+            { opacity: 1, transform: "translateY(0)" },
+            { opacity: 0, transform: "translateY(-6px)" }
+          ],
+          { duration: 200, easing: "cubic-bezier(0.16, 1, 0.3, 1)" }
+        ) || null;
+
+        currentAnim.onfinish = () => {
+          legalDetails.open = false;
+          legalDetails.style.height = "";
+          legalDetails.style.overflow = "";
+          isClosing = false;
+          currentAnim = null;
+          contentAnim = null;
+        };
+      }
+    });
+  }
 </script>

@@ -20,11 +20,11 @@ def generate_password(
 ) -> str:
     """Generate a password using Python's cryptographically secure RNG."""
     if not isinstance(length, int) or isinstance(length, bool):
-        raise TypeError("length must be an integer")
+        raise TypeError("La longitud debe ser un número entero.")
     if length < MIN_LENGTH:
         length = MIN_LENGTH
     if length > MAX_LENGTH:
-        raise ValueError(f"length cannot exceed {MAX_LENGTH}")
+        raise ValueError(f"La longitud máxima es de {MAX_LENGTH} caracteres.")
 
     pools = []
     if lowercase:
@@ -36,10 +36,10 @@ def generate_password(
     if symbols:
         pools.append(string.punctuation)
     if not pools:
-        raise ValueError("at least one character set must be enabled")
+        raise ValueError("Selecciona al menos un tipo de carácter.")
 
     if length < len(pools):
-        raise ValueError("length is too short for the selected character sets")
+        raise ValueError("La longitud es demasiado corta para los tipos seleccionados.")
 
     characters = [secrets.choice(pool) for pool in pools]
     alphabet = "".join(pools)
@@ -51,6 +51,8 @@ def generate_password(
 
 def estimate_entropy(length: int, alphabet_size: int) -> float:
     """Estimate password entropy in bits for display purposes."""
+    if length <= 0 or alphabet_size <= 1:
+        return 0.0
     return round(length * math.log2(alphabet_size), 1)
 
 
@@ -59,5 +61,10 @@ def estimate_exhaustive_years(
     guesses_per_second: int = 100_000_000_000,
 ) -> float:
     """Estimate a full keyspace search under an explicit attack assumption."""
-    seconds = 2**entropy / guesses_per_second
-    return round(seconds / (60 * 60 * 24 * 365.25), 1)
+    if entropy <= 0 or guesses_per_second <= 0:
+        return 0.0
+    try:
+        seconds = math.pow(2.0, min(entropy, 1000.0)) / guesses_per_second
+        return round(seconds / (60 * 60 * 24 * 365.25), 1)
+    except OverflowError:
+        return float("inf")

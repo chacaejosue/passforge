@@ -48,7 +48,7 @@ A partir de esa revisión desarrollé una segunda versión (`v2`) utilizando `se
 
 La versión actual separa la lógica de generación de la interacción por consola, permitiendo reutilizar el generador desde otras interfaces.
 
-PassForge evoluciona ahora hacia una aplicación web moderna: Flask expone una API REST en Python y Astro proporciona una interfaz rápida y accesible. La contraseña se genera en el backend con `secrets`, no se almacena ni se registra.
+PassForge evoluciona ahora hacia una aplicación web moderna: Flask expone una API REST en Python y Astro proporciona una interfaz rápida, reactiva y accesible. La contraseña se genera en el backend con `secrets` (y cuenta con un modo de respaldo local con Web Crypto CSPRNG si el servidor no está disponible), sin almacenarse ni registrarse en ningún momento.
 
 El repositorio conserva la implementación original junto con la versión actual con un propósito educativo:
 
@@ -101,7 +101,7 @@ Desde la raíz del proyecto:
 python -m src.cli
 ```
 
-El programa solicita la longitud de la contraseña y aplica una longitud mínima de **12 caracteres**.
+El programa solicita la longitud de la contraseña y aplica un rango seguro de **12 a 128 caracteres**.
 
 > [!WARNING]
 > La implementación ubicada en `legacy/` se conserva únicamente como referencia educativa. Para utilizar la versión actual por consola, ejecuta `src.cli`.
@@ -144,13 +144,13 @@ La seguridad real también depende del servicio donde se use la contraseña, su 
 
 ### Despliegue en Vercel
 
-El repositorio incluye `api/index.py` y `vercel.json` para desplegar el backend Flask como función Python. Puedes crear un proyecto Vercel con la raíz del repositorio para la API y otro con `frontend/` como raíz para Astro. En el proyecto frontend, define `PUBLIC_API_URL` con la URL pública de la API.
+El repositorio incluye `api/index.py` y `vercel.json` para desplegar el backend Flask como función Python junto con el frontend de Astro y las cabeceras de seguridad HTTP (`CSP`, `HSTS`, `X-Frame-Options`, `X-Content-Type-Options`).
 
 ---
 
 ## Pruebas
 
-PassForge incluye pruebas automatizadas para comprobar el comportamiento de la lógica principal del generador.
+PassForge incluye pruebas automatizadas para comprobar el comportamiento de la lógica principal del generador y de la API REST.
 
 Las pruebas utilizan `unittest`, incluido en la biblioteca estándar de Python, por lo que no requieren instalar dependencias adicionales.
 
@@ -164,12 +164,11 @@ python -m unittest discover -s backend/tests -v
 Las pruebas verifican que:
 
 - el resultado generado sea una cadena de texto;
-- se respete la longitud solicitada;
-- se aplique la longitud mínima;
-- exista al menos una letra minúscula;
-- exista al menos una letra mayúscula;
-- exista al menos un número;
-- exista al menos un símbolo.
+- se respete la longitud solicitada y los límites mínimo (12) y máximo (128);
+- exista al menos una letra minúscula, mayúscula, número y símbolo cuando están activos;
+- se respete el filtrado de subconjuntos individuales de caracteres;
+- se rechacen entradas no válidas (como booleanos o todos los conjuntos desactivados);
+- se apliquen cabeceras de seguridad (`Cache-Control: no-store`, `X-Frame-Options: DENY`, CORS) y límite de tasa (*Rate Limiting*).
 
 Si todas las pruebas se completan correctamente, el resultado finalizará con:
 
@@ -184,6 +183,7 @@ OK
 ```text
 pass-forge/
 ├── assets/
+│   ├── logo.svg
 │   └── portada-passforge.svg
 ├── api/
 │   └── index.py
@@ -196,8 +196,15 @@ pass-forge/
 ├── frontend/
 │   ├── public/
 │   ├── src/
-│   │   └── components/
-│   │       └── PasswordManagerGuide.astro
+│   │   ├── components/
+│   │   │   ├── PasswordGenerator.astro
+│   │   │   └── PasswordManagerGuide.astro
+│   │   ├── layouts/
+│   │   │   └── Layout.astro
+│   │   ├── pages/
+│   │   │   └── index.astro
+│   │   └── styles/
+│   │       └── global.css
 │   ├── .env.example
 │   ├── package-lock.json
 │   ├── package.json
@@ -219,20 +226,18 @@ pass-forge/
 ```
 
 - `legacy/` conserva la implementación original basada en `random`.
-- `backend/passforge/generator.py` contiene la lógica de generación de contraseñas.
+- `backend/passforge/generator.py` contiene la lógica criptográfica de generación de contraseñas.
 - `backend/passforge/routes.py` contiene los endpoints de la API Flask.
-- `backend/passforge/app.py` crea la aplicación Flask.
+- `backend/passforge/app.py` crea la aplicación Flask con cabeceras de seguridad y *rate limiting*.
 - `frontend/` contiene la interfaz Astro, estilos y recursos públicos.
+- `frontend/src/components/PasswordGenerator.astro` proporciona el generador interactivo con soporte para la API Flask y modo de respaldo Web Crypto CSPRNG.
 - `frontend/src/components/PasswordManagerGuide.astro` orienta sobre el almacenamiento seguro.
 - `api/index.py` es el punto de entrada serverless para Vercel.
-- `src/generator.py` mantiene compatibilidad con la CLI y las primeras pruebas.
+- `src/generator.py` mantiene compatibilidad con la CLI y las pruebas originales re-exportando el motor principal.
 - `src/cli.py` contiene la interacción mediante consola.
 - `src/web.py` mantiene compatibilidad con el comando Flask original.
 - `src/__init__.py` permite utilizar `src` como paquete de Python.
-- `tests/test_generator.py` contiene las pruebas automatizadas del generador.
-- `assets/` almacena los recursos visuales utilizados por el repositorio.
-- `requirements.txt` incluye las dependencias del backend Python.
-- `frontend/package.json` y `frontend/package-lock.json` gestionan las dependencias del frontend.
+- `tests/test_generator.py` y `backend/tests/test_api.py` contienen las pruebas automatizadas.
 
 ---
 
@@ -284,48 +289,31 @@ Además, la primera implementación:
 
 La segunda versión sustituye `random` por `secrets` y separa la lógica de generación de la interacción por consola.
 
-La implementación histórica de esta etapa se conserva en `src/generator.py`:
+La implementación reutilizable actual se encuentra en `backend/passforge/generator.py` (y se re-exporta en `src/generator.py` por compatibilidad con la CLI):
 
 ```python
 import secrets
 import string
 
-
 MIN_LENGTH = 12
+MAX_LENGTH = 128
 
+def generate_password(
+    length: int,
+    *,
+    lowercase: bool = True,
+    uppercase: bool = True,
+    digits: bool = True,
+    symbols: bool = True,
+) -> str:
+    # Selección criptográficamente segura con al menos un carácter de cada conjunto activo
+    characters = [secrets.choice(pool) for pool in pools]
+    alphabet = "".join(pools)
+    characters.extend(secrets.choice(alphabet) for _ in range(length - len(pools)))
 
-def generate_password(length):
-    if length < MIN_LENGTH:
-        length = MIN_LENGTH
-
-    lowercase = string.ascii_lowercase
-    uppercase = string.ascii_uppercase
-    digits = string.digits
-    symbols = string.punctuation
-
-    characters = [
-        secrets.choice(uppercase),
-        secrets.choice(lowercase),
-        secrets.choice(digits),
-        secrets.choice(symbols),
-    ]
-
-    all_characters = lowercase + uppercase + digits + symbols
-    remaining = length - len(characters)
-
-    characters.extend(
-        secrets.choice(all_characters)
-        for _ in range(remaining)
-    )
-
-    for i in range(len(characters) - 1, 0, -1):
-        j = secrets.randbelow(i + 1)
-        characters[i], characters[j] = characters[j], characters[i]
-
+    secrets.SystemRandom().shuffle(characters)
     return "".join(characters)
 ```
-
-La CLI mantiene compatibilidad con esta interfaz histórica. La implementación reutilizable actual se encuentra en `backend/passforge/generator.py` y la API Flask la utiliza directamente.
 
 ### `secrets`
 
@@ -338,24 +326,22 @@ La CLI mantiene compatibilidad con esta interfaz histórica. La implementación 
 
 Este es el cambio más importante entre ambas versiones.
 
-### Longitud mínima
+### Rango de longitud seguro
 
-La versión actual utiliza una longitud mínima de **12 caracteres**.
+La versión actual utiliza una longitud mínima de **12 caracteres** y una máxima de **128 caracteres**.
 
-Si se solicita una longitud inferior, la lógica del generador la ajusta automáticamente al mínimo establecido.
-
-La interfaz CLI informa al usuario cuando se realiza este ajuste.
+Si se solicita una longitud inferior al mínimo, la lógica del generador la ajusta automáticamente a 12.
 
 ### Reglas de composición
 
-La contraseña generada incluye al menos:
+Cuando los cuatro conjuntos están habilitados, la contraseña generada incluye al menos:
 
 - una letra mayúscula;
 - una letra minúscula;
 - un número;
 - un símbolo.
 
-Estas reglas evitan resultados que, por azar, contengan únicamente una clase de caracteres.
+Estas reglas evitan resultados que, por azar, omitan alguna de las clases de caracteres seleccionadas.
 
 ### Separación entre lógica e interfaz
 
@@ -366,9 +352,9 @@ src/cli.py
     │
     │ solicita y valida la entrada del usuario
     ▼
-src/generator.py
+src/generator.py ──► backend/passforge/generator.py
     │
-    │ genera la contraseña
+    │ genera la contraseña con secrets
     ▼
 resultado
 ```
@@ -379,9 +365,9 @@ resultado
 
 ## Aplicación web actual
 
-PassForge incorpora Flask como primer paso para añadir una interfaz web.
+PassForge incorpora Flask y Astro para exponer el generador en una interfaz web moderna.
 
-La aplicación web actual se organiza en:
+La aplicación backend se organiza en:
 
 ```text
 backend/passforge/app.py
@@ -394,22 +380,12 @@ GET  /api/health
 POST /api/passwords
 ```
 
-La implementación actual permite trabajar con conceptos como:
-
-- servidor web;
-- aplicación Flask;
-- rutas;
-- peticiones HTTP;
-- respuestas JSON;
-- validación de entradas;
-- despliegue serverless.
-
-El flujo actual integra la API con el generador:
+El flujo actual integra tanto la CLI como la interfaz web con el generador:
 
 ```text
-CLI ──────→ src/generator.py ──────→ backend/passforge/generator.py
-
-WEB ──────→ api/index.py ──────→ Flask ──────→ secrets
+CLI ──────► src/generator.py ──────► backend/passforge/generator.py
+                                               ▲
+WEB (Astro) ──► /api/passwords (Flask) ────────┘
 ```
 
 ---
@@ -420,13 +396,14 @@ WEB ──────→ api/index.py ──────→ Flask ────�
 |---|---|---|
 | Fuente de aleatoriedad | `random` | `secrets` |
 | Tipo de aleatoriedad | PRNG de propósito general | Fuente criptográficamente segura |
-| Longitud mínima | 10 | 12 |
-| Mayúsculas | No garantizadas | Garantizadas |
-| Minúsculas | No garantizadas | Garantizadas |
-| Números | No garantizados | Garantizados |
-| Símbolos | No garantizados | Garantizados |
+| Longitud mínima / máxima | 10 / sin límite | 12 / 128 |
+| Mayúsculas | No garantizadas | Garantizadas (seleccionables) |
+| Minúsculas | No garantizadas | Garantizadas (seleccionables) |
+| Números | No garantizados | Garantizados (seleccionables) |
+| Símbolos | No garantizados | Garantizados (seleccionables) |
 | Separación entre lógica e interfaz | No | Sí |
 | Pruebas automatizadas | No | Sí |
+| Protección HTTP y Rate Limiting | No | Sí |
 | Uso dentro del proyecto | Referencia educativa | Versión actual |
 
 ---
@@ -454,7 +431,7 @@ secrets.choice(...)
 y:
 
 ```python
-secrets.randbelow(...)
+secrets.SystemRandom().shuffle(...)
 ```
 
 ---
@@ -464,7 +441,7 @@ secrets.randbelow(...)
 ### CLI
 
 ```text
-Longitud de la contraseña (mínimo 12): 16
+Longitud de la contraseña (mínimo 12, máximo 128): 16
 Tu contraseña segura: ****************
 ```
 
@@ -473,7 +450,7 @@ La contraseña mostrada arriba es únicamente ilustrativa.
 Si se introduce una longitud inferior al mínimo:
 
 ```text
-Longitud de la contraseña (mínimo 12): 8
+Longitud de la contraseña (mínimo 12, máximo 128): 8
 Por seguridad, ajustaremos la longitud a 12.
 Tu contraseña segura: ************
 ```
@@ -481,9 +458,9 @@ Tu contraseña segura: ************
 Si la entrada no corresponde a un número:
 
 ```text
-Longitud de la contraseña (mínimo 12): hola
+Longitud de la contraseña (mínimo 12, máximo 128): hola
 "hola" no es un número válido.
-Longitud de la contraseña (mínimo 12):
+Longitud de la contraseña (mínimo 12, máximo 128):
 ```
 
 ### API web
@@ -510,35 +487,25 @@ la API responde:
 
 ## Consideraciones de seguridad
 
-PassForge es principalmente un **proyecto educativo**.
+PassForge comenzó como un proyecto educativo y ha evolucionado para ofrecer generación de contraseñas criptográficamente segura tanto en consola como en la web.
 
-La versión actual mejora la implementación original utilizando una fuente de aleatoriedad apropiada para generar valores sensibles, pero el proyecto no pretende sustituir un gestor de contraseñas completo.
-
-Entre otras cosas, un sistema completo de gestión de credenciales también debe considerar aspectos como:
-
-- almacenamiento seguro;
-- protección del portapapeles;
-- manejo de datos sensibles;
-- integración con otros sistemas;
-- políticas y requisitos específicos del entorno donde se utilice.
-
-La API procesa la solicitud y transmite la contraseña al navegador para que el usuario pueda verla y copiarla, pero no la almacena ni la registra. En producción debe utilizarse HTTPS y configurarse `FRONTEND_URL` con el origen real del frontend.
+- **Generación:** Utiliza el CSPRNG del sistema operativo mediante `secrets` en Python (y cuenta con respaldo local mediante `window.crypto.getRandomValues` en el navegador si la API no está disponible).
+- **Privacidad:** La API procesa la solicitud en memoria, incluye `Cache-Control: no-store` y no almacena ni registra ninguna contraseña generada.
+- **Protección de la aplicación:** Incluye cabeceras de seguridad (`CSP`, `HSTS`, `X-Frame-Options: DENY`, `X-Content-Type-Options: nosniff`), validación estricta de entrada y límite de peticiones por IP (*Rate Limiting*). En producción debe utilizarse HTTPS y configurarse `FRONTEND_URL` con el origen real del frontend.
 
 ---
 
-## Próximos pasos
+## Hitos completados y evolución futura
 
-Algunas mejoras planteadas para futuras versiones:
-
-- [ ] Permitir seleccionar los conjuntos de caracteres utilizados.
-- [ ] Permitir excluir determinados símbolos.
 - [x] Separar la lógica de generación de la interfaz CLI.
-- [ ] Añadir validaciones de entrada adicionales.
-- [x] Incorporar pruebas automatizadas.
-- [ ] Mejorar la experiencia de uso desde consola.
-- [x] Añadir la estructura inicial de la aplicación Flask.
-- [ ] Integrar el generador de contraseñas con Flask.
-- [ ] Añadir una interfaz web para generar contraseñas.
+- [x] Incorporar pruebas automatizadas para el generador y la API.
+- [x] Añadir la estructura de la aplicación Flask e integrar el generador.
+- [x] Añadir una interfaz web moderna con Astro.
+- [x] Permitir seleccionar los conjuntos de caracteres utilizados.
+- [x] Añadir validaciones de entrada adicionales, cabeceras de seguridad y *rate limiting*.
+- [x] Incorporar modo de respaldo local con Web Crypto CSPRNG en el navegador.
+- [ ] Permitir excluir determinados símbolos ambiguos (`l`, `1`, `I`, `O`, `0`).
+- [ ] Añadir generador de frases de paso (*passphrases* estilo Diceware).
 
 ---
 
@@ -546,15 +513,9 @@ Algunas mejoras planteadas para futuras versiones:
 
 PassForge me permitió practicar y reforzar conceptos como:
 
-`Python` · `random` · `secrets` · `string` · `CLI` · `Flask` · `HTTP` · `rutas` · `unittest` · `testing` · `validación` · `aleatoriedad` · `modularización` · `código seguro`
+`Python` · `random` · `secrets` · `string` · `CLI` · `Flask` · `Astro` · `HTTP` · `rutas` · `unittest` · `testing` · `validación` · `aleatoriedad` · `modularización` · `código seguro`
 
 También sirvió como ejercicio para revisar una solución anterior y documentar su evolución en lugar de reemplazarla sin conservar el razonamiento detrás de los cambios.
-
-La separación entre `generator.py` y `cli.py` añade una nueva etapa al proyecto: desacoplar la lógica principal de la interfaz que la utiliza.
-
-Las pruebas automatizadas permiten verificar el comportamiento esperado del generador y detectar regresiones antes de continuar incorporando nuevas funcionalidades o interfaces.
-
-La incorporación inicial de Flask introduce además los conceptos básicos necesarios para comenzar a exponer la lógica existente mediante una aplicación web.
 
 ---
 
