@@ -46,3 +46,6 @@ htmlcov/
 Thumbs.db
 .idea/
 .vscode/
+
+# Configuración de asistentes y agentes IA
+.agents/
