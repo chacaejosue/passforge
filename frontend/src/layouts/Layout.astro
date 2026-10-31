@@ -5,15 +5,66 @@ const {
   title = "PassForge | Generador seguro de contraseñas",
   description = "Genera contraseñas criptográficamente seguras con Python, Flask y secrets.",
 } = Astro.props;
+
+const siteUrl = "https://pass-forge-lovat.vercel.app";
+const ogImageUrl = `${siteUrl}/portada-passforge.svg`;
+
+const schemaData = {
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "PassForge",
+  "url": `${siteUrl}/`,
+  "applicationCategory": "SecurityApplication",
+  "operatingSystem": "All",
+  "description": description,
+  "browserRequirements": "Requires JavaScript. Requires HTML5.",
+  "softwareVersion": "1.0.0",
+  "author": {
+    "@type": "Person",
+    "name": "Josué Chacae",
+    "url": "https://josuechacae.dev/"
+  }
+};
 ---
 <!doctype html>
 <html lang="es">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <title>{title}</title>
     <meta name="description" content={description} />
     <meta name="color-scheme" content="light dark" />
+    <link rel="canonical" href={`${siteUrl}/`} />
+
+    <!-- Verificación Google Search Console -->
+    <meta name="google-site-verification" content="googleb5b7ccc5531c4c29" />
+
+    <!-- Favicons estándar e ICO (compatibilidad Google Search y navegadores) -->
+    <link rel="icon" href="/favicon.ico" sizes="48x48" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" type="image/png" sizes="48x48" href="/favicon-48x48.png" />
+    <link rel="icon" type="image/png" sizes="96x96" href="/favicon-96x96.png" />
+    <link rel="icon" type="image/png" sizes="192x192" href="/favicon-192x192.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <link rel="shortcut icon" href="/favicon.ico" />
+
+    <!-- Open Graph / Redes Sociales -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content={`${siteUrl}/`} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:image" content={ogImageUrl} />
+
+    <!-- Twitter Cards -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:url" content={`${siteUrl}/`} />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImageUrl} />
+
+    <!-- Schema.org Datos Estructurados JSON-LD -->
+    <script type="application/ld+json" is:inline set:html={JSON.stringify(schemaData)} />
+
     <Analytics />
     <script is:inline>
       document.documentElement.classList.add("js");
@@ -29,7 +80,6 @@ const {
         history.scrollRestoration = "manual";
       }
     </script>
-    <title>{title}</title>
   </head>
   <body><slot /></body>
 </html>
