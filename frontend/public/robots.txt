@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://pass-forge-lovat.vercel.app/sitemap.xml
+Sitemap: https://passforge-fresh.vercel.app/sitemap.xml
